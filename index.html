@@ -108,7 +108,7 @@ async function nextBillNo(){
   return prefix+String(n).padStart(4,'0');
 }
 async function savePawn(){
-  let n=name.value.trim(),m=mobile.value.trim(),l=Number(loan.value||0);
+  let n=document.getElementById('name').value.trim(),m=document.getElementById('mobile').value.trim(),l=Number(document.getElementById('loan').value||0);
   if(!n||!m||!l){alert('பெயர், மொபைல், Loan Amount கட்டாயம்');return}
   try{
     let customer=db.customers.find(c=>c.mobile===m);
