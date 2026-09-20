@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="ta">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#064d3b"><link rel="manifest" href="manifest.json">
+<title>A M தங்க நகை அடகு கடை - Online</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,"Noto Sans Tamil",sans-serif;background:#eef3f0;color:#17332b}
+header{background:linear-gradient(135deg,#043f31,#0b6b50);color:#fff;padding:16px;position:sticky;top:0;z-index:5}.brand{font-size:23px;font-weight:800;color:#ffd65a}.sub{font-size:12px}
+nav{display:flex;gap:6px;overflow:auto;background:#fff;padding:8px;position:sticky;top:74px;z-index:4;box-shadow:0 2px 8px #0001}nav button{border:0;border-radius:9px;padding:10px 12px;white-space:nowrap;font-weight:700;color:#07523e}nav button.active{background:#07523e;color:#fff}
+main{max-width:1100px;margin:auto;padding:14px}.page{display:none}.page.active{display:block}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}.card{background:#fff;border-radius:15px;padding:15px;margin-bottom:12px;box-shadow:0 3px 14px #0001}.kpi{font-size:25px;font-weight:800}.gold{color:#a87500}.green{color:#08724f}.red{color:#b12c2c}.blue{color:#1e63a8}
+.row{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}label{display:block;font-size:13px;font-weight:700;margin:8px 0 4px}input,select,textarea{width:100%;padding:10px;border:1px solid #ccd8d2;border-radius:8px;font-size:15px}textarea{min-height:65px}
+button.primary,button.secondary,button.danger{border:0;border-radius:9px;padding:11px 15px;font-weight:800}.primary{background:#087452;color:#fff}.secondary{background:#deece6;color:#07523e}.danger{background:#b52f2f;color:#fff}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.muted{color:#718078;font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:8px;border-bottom:1px solid #e2e8e5;text-align:left}th{background:#eff6f2}.search{margin-bottom:10px}
+.badge{padding:4px 7px;border-radius:6px;background:#e8f5ef;color:#08724f;font-weight:700}.closed{background:#eee;color:#777}
+.bill{max-width:760px;margin:auto;border:3px solid #07523e;border-radius:12px;padding:18px;background:#fff}.bill h1{text-align:center;color:#07523e;margin:0}.bill h3{background:#07523e;color:#fff;padding:7px;border-radius:5px}.total{font-size:20px;font-weight:800}.billfooter{text-align:center;border-top:2px solid #07523e;padding-top:10px;margin-top:18px}
+.toast{position:fixed;right:15px;bottom:15px;background:#07523e;color:#fff;padding:12px 15px;border-radius:9px;display:none;z-index:10}.login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#043f31,#0b6b50)}.login .card{width:min(430px,100%);margin:0}.login h1{color:#07523e}.userbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px;background:#fff;border-bottom:1px solid #dbe6e1;font-size:12px}.statusdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#0a9a65;margin-right:5px}
+@media(max-width:650px){.row,.row3{grid-template-columns:1fr}.brand{font-size:20px}}
+@media print{header,nav,.no-print{display:none!important}.page{display:none!important}.page#billPage{display:block!important}body{background:#fff}.bill{border:1px solid #000;box-shadow:none}}
+</style></head>
+<body>
+<div id="loginPage" class="login">
+  <div class="card">
+    <h1>A M தங்க நகை அடகு கடை</h1>
+    <p class="muted">Online Pawn Management System</p>
+    <label>Email</label><input id="loginEmail" type="email" autocomplete="username" placeholder="admin@example.com">
+    <label>Password</label><input id="loginPassword" type="password" autocomplete="current-password" placeholder="Password">
+    <div class="actions"><button class="primary" onclick="login()">🔐 Login</button></div>
+    <p id="loginMsg" class="muted"></p>
+    <p class="muted">முதல் login user-ஐ Supabase → Authentication → Users பகுதியில் உருவாக்கவும்.</p>
+  </div>
+</div>
+<div id="appShell" style="display:none">
+<header><div class="brand">A M தங்க நகை அடகு கடை</div><div class="sub">T. சுக்காம்பட்டி, தமிழ்நாடு • 8973378328</div></header>
+<div class="userbar"><span><span class="statusdot"></span><span id="userEmail"></span> • Supabase Online</span><button class="secondary" onclick="logout()">Logout</button></div>
+<nav>
+<button data-p="home" class="active">முகப்பு</button><button data-p="new">புதிய அடகு</button><button data-p="loans">அடகு</button><button data-p="customers">வாடிக்கையாளர்கள்</button><button data-p="payments">வசூல்</button><button data-p="reports">அறிக்கைகள்</button><button data-p="settings">அமைப்புகள்</button>
+</nav>
+<main>
+<section id="home" class="page active">
+<div class="grid"><div class="card"><div class="muted">இன்றைய அடகு</div><div id="k1" class="kpi green">0</div></div><div class="card"><div class="muted">மொத்த Loan</div><div id="k2" class="kpi gold">₹0</div></div><div class="card"><div class="muted">Outstanding</div><div id="k3" class="kpi red">₹0</div></div><div class="card"><div class="muted">மீட்கப்பட்டது</div><div id="k4" class="kpi blue">0</div></div></div>
+<div class="card"><h2>விரைவு செயல்கள்</h2><div class="actions"><button class="primary" onclick="page('new')">＋ புதிய அடகு</button><button class="secondary" onclick="page('payments')">₹ வசூல்</button><button class="secondary" onclick="page('loans')">🔎 தேடல்</button></div></div>
+</section>
+
+<section id="new" class="page"><div class="card"><h2>புதிய நகை அடகு</h2>
+<div class="row"><div><label>வாடிக்கையாளர் பெயர் *</label><input id="name"></div><div><label>மொபைல் *</label><input id="mobile" inputmode="tel"></div></div>
+<label>முகவரி</label><textarea id="address"></textarea>
+<div class="row"><div><label>ID வகை</label><select id="idtype"><option>Aadhaar</option><option>Driving Licence</option><option>Voter ID</option><option>Other</option></select></div><div><label>ID Number</label><input id="idno"></div></div></div>
+<div class="card"><h3>அடகு வகை & நகை</h3><div class="row3"><div><label>அடகு வகை *</label><select id="metal" onchange="setRate()"><option value="GOLD">தங்கம்</option><option value="SILVER">வெள்ளி</option></select></div><div><label>நகை வகை</label><input id="item" placeholder="செயின் / மோதிரம்"></div><div><label>Gross Weight (g)</label><input id="gross" type="number" step=".001"></div></div>
+<div class="row3"><div><label>Stone Weight (g)</label><input id="stone" type="number" step=".001" value="0"></div><div><label>Net Weight (g)</label><input id="net" readonly></div><div><label>Purity</label><select id="purity"><option>22K (916)</option><option>18K</option><option>20K</option><option>Silver</option></select></div></div>
+<div class="row3"><div><label>Rate ₹/g</label><input id="rate" type="number" step=".01"></div><div><label>Loan Amount ₹ *</label><input id="loan" type="number" step=".01"></div><div><label>மாத வட்டி %</label><input id="interest" type="number" step=".01" readonly></div></div>
+<div class="row3"><div><label>Loan Period (Months)</label><input id="months" type="number" value="6"></div><div><label>Due Date</label><input id="due" type="date"></div><div><label>Notes</label><input id="notes"></div></div>
+<div class="actions"><button class="primary" onclick="savePawn()">💾 Save & Bill</button><button class="secondary" onclick="clearForm()">Clear</button></div></div></section>
+
+<section id="loans" class="page"><div class="card"><h2>அடகு பட்டியல்</h2><input class="search" id="qloan" oninput="renderLoans()" placeholder="Bill No / பெயர் / மொபைல்"><div id="loanTable"></div></div></section>
+<section id="customers" class="page"><div class="card"><h2>வாடிக்கையாளர்கள்</h2><input class="search" id="qcus" oninput="renderCustomers()" placeholder="பெயர் / மொபைல்"><div id="cusTable"></div></div></section>
+<section id="payments" class="page"><div class="card"><h2>வசூல்</h2><div class="row"><div><label>Bill No</label><input id="paybill"></div><div><label>வசூல் தொகை ₹</label><input id="payamt" type="number"></div></div><div class="row"><div><label>வகை</label><select id="paytype"><option>Interest</option><option>Principal</option><option>Full Settlement</option></select></div><div><label>தேதி</label><input id="paydate" type="date"></div></div><div class="actions"><button class="primary" onclick="payment()">வசூல் பதிவு</button></div><div id="paymsg" class="muted"></div></div></section>
+<section id="reports" class="page"><div class="card"><h2>அறிக்கைகள்</h2><div class="grid"><div><b>Customers</b><div id="rc" class="kpi">0</div></div><div><b>Active Loans</b><div id="ra" class="kpi">0</div></div><div><b>Closed</b><div id="rcl" class="kpi">0</div></div><div><b>Interest Collected</b><div id="ri" class="kpi gold">₹0</div></div></div></div></section>
+<section id="settings" class="page"><div class="card"><h2>கடை அமைப்புகள்</h2><div class="row"><div><label>கடை பெயர்</label><input value="A M தங்க நகை அடகு கடை" readonly></div><div><label>Phone</label><input value="8973378328" readonly></div></div><label>முகவரி</label><input value="T. சுக்காம்பட்டி, தமிழ்நாடு" readonly><div class="row"><div><label>தங்க மாத வட்டி %</label><input value="2" readonly></div><div><label>வெள்ளி மாத வட்டி %</label><input value="4" readonly></div></div><p class="muted">Supabase Online mode. Login செய்த பயனர்களின் customer, loan, payment data cloud database-ல் சேமிக்கப்படும்.</p></div></section>
+<section id="billPage" class="page"><div class="no-print actions"><button class="secondary" onclick="page('loans')">← திரும்ப</button><button class="primary" onclick="window.print()">🖨️ Print / PDF</button></div><div class="bill" id="bill"></div></section>
+</main></div><div id="toast" class="toast"></div>
+<script>
+const SUPABASE_URL='https://yexocjonxnabhtyowaej.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY='sb_publishable_mY8O-2--hZi3nToKyHaNwQ_A6sFlvrc';
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+let db={loans:[],payments:[],customers:[]};
+const money=n=>'₹'+Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2});
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const today=()=>new Date().toISOString().slice(0,10);
+function msg(id,t){const e=document.getElementById(id);if(e)e.textContent=t}
+function toast(t){const e=document.getElementById('toast');e.textContent=t;e.style.display='block';setTimeout(()=>e.style.display='none',2200)}
+async function login(){
+  const email=loginEmail.value.trim(), password=loginPassword.value;
+  if(!email||!password){msg('loginMsg','Email மற்றும் Password கொடுக்கவும்.');return}
+  msg('loginMsg','Login செய்கிறது...');
+  const {error}=await sb.auth.signInWithPassword({email,password});
+  if(error){msg('loginMsg',error.message);return}
+  await startApp();
+}
+async function logout(){await sb.auth.signOut();location.reload()}
+async function startApp(){
+  const {data:{user}}=await sb.auth.getUser();
+  if(!user)return;
+  loginPage.style.display='none';appShell.style.display='block';userEmail.textContent=user.email||'';
+  await loadAll();setRate();dash();
+}
+async function loadAll(){
+  const [l,p,c]=await Promise.all([
+    sb.from('loans').select('*').order('created_at',{ascending:false}),
+    sb.from('payments').select('*').order('created_at',{ascending:false}),
+    sb.from('customers').select('*').order('created_at',{ascending:false})
+  ]);
+  if(l.error||p.error||c.error){
+    const er=l.error||p.error||c.error; alert('Supabase database error: '+er.message+'\n\nRLS/security SQL run செய்யப்பட்டதா என்று பார்க்கவும்.'); return;
+  }
+  db.loans=l.data||[];db.payments=p.data||[];db.customers=c.data||[];dash();
+}
+function page(id){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.p===id));if(id==='loans')renderLoans();if(id==='customers')renderCustomers();if(id==='reports')reports();if(id==='home')dash()}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>page(b.dataset.p));
+function setRate(){document.getElementById('interest').value=document.getElementById('metal').value==='GOLD'?2:4}
+document.getElementById('gross').oninput=document.getElementById('stone').oninput=()=>document.getElementById('net').value=Math.max(0,Number(gross.value||0)-Number(stone.value||0)).toFixed(3);
+async function nextBillNo(){
+  const {data,error}=await sb.from('loans').select('bill_no').order('created_at',{ascending:false}).limit(1);
+  if(error) throw error;
+  const prefix='AM'+today().replaceAll('-','');
+  let n=1;if(data&&data[0]?.bill_no){const m=String(data[0].bill_no).match(/(\d+)$/);if(m)n=Number(m[1])+1}
+  return prefix+String(n).padStart(4,'0');
+}
+async function savePawn(){
+  let n=name.value.trim(),m=mobile.value.trim(),l=Number(loan.value||0);
+  if(!n||!m||!l){alert('பெயர், மொபைல், Loan Amount கட்டாயம்');return}
+  try{
+    let customer=db.customers.find(c=>c.mobile===m);
+    if(customer){
+      const {data,error}=await sb.from('customers').update({name:n,address:address.value,id_type:idtype.value,id_number:idno.value}).eq('id',customer.id).select().single();
+      if(error)throw error;customer=data;db.customers=db.customers.map(c=>c.id===data.id?data:c);
+    }else{
+      const {data,error}=await sb.from('customers').insert({name:n,mobile:m,address:address.value,id_type:idtype.value,id_number:idno.value}).select().single();
+      if(error)throw error;customer=data;db.customers.unshift(data);
+    }
+    const billNo=await nextBillNo();
+    const payload={bill_no:billNo,customer_id:customer.id,metal:metal.value,item:item.value||'Jewellery',gross_weight:Number(gross.value||0),stone_weight:Number(stone.value||0),net_weight:Number(net.value||0),purity:purity.value,gold_rate:Number(rate.value||0),loan_amount:l,interest_percent:Number(interest.value),loan_months:Number(months.value||0),due_date:due.value||null,notes:notes.value||null,status:'ACTIVE',principal_paid:0};
+    const {data,error}=await sb.from('loans').insert(payload).select().single();
+    if(error)throw error;
+    const x={...data,id:data.bill_no,date:data.created_at?data.created_at.slice(0,10):today(),name:n,mobile:m,address:address.value,idtype:idtype.value,idno:idno.value,item:data.item,gross:Number(data.gross_weight||0),stone:Number(data.stone_weight||0),net:Number(data.net_weight||0),purity:data.purity,rate:Number(data.gold_rate||0),loan:Number(data.loan_amount||0),interest:Number(data.interest_percent||0),months:Number(data.loan_months||0),due:data.due_date||'',notes:data.notes||'',status:data.status,principalPaid:Number(data.principal_paid||0),uuid:data.id};
+    db.loans.unshift(data);bill(x);page('billPage');clearForm();dash();toast('அடகு பதிவு வெற்றிகரமாக சேமிக்கப்பட்டது');
+  }catch(e){alert('Save error: '+e.message)}
+}
+function clearForm(){['name','mobile','address','idno','item','gross','stone','net','rate','loan','due','notes'].forEach(id=>document.getElementById(id).value='');stone.value=0;months.value=6;setRate()}
+function loanView(x){
+ return {id:x.bill_no||x.id,date:x.created_at?x.created_at.slice(0,10):(x.date||today()),name:(x.customers?.name||x.name||''),mobile:(x.customers?.mobile||x.mobile||''),address:x.customers?.address||x.address||'',idtype:x.customers?.id_type||x.idtype||'',idno:x.customers?.id_number||x.idno||'',metal:x.metal,item:x.item||'Jewellery',gross:Number(x.gross_weight??x.gross??0),stone:Number(x.stone_weight??x.stone??0),net:Number(x.net_weight??x.net??0),purity:x.purity,rate:Number(x.gold_rate??x.rate??0),loan:Number(x.loan_amount??x.loan??0),interest:Number(x.interest_percent??x.interest??0),months:Number(x.loan_months??x.months??0),due:x.due_date||x.due||'',notes:x.notes||'',status:x.status||'ACTIVE',principalPaid:Number(x.principal_paid??x.principalPaid??0),uuid:x.id};
+}
+function bill(x){document.getElementById('bill').innerHTML=`<h1>A M தங்க நகை அடகு கடை</h1><div style="text-align:center">T. சுக்காம்பட்டி, தமிழ்நாடு • 8973378328</div><p style="text-align:center"><b>நகை அடகு சீட்டு / PAWN TICKET</b></p><hr><div class="row"><div><b>Bill No:</b> ${esc(x.id)}<br><b>Customer:</b> ${esc(x.name)}</div><div><b>Date:</b> ${x.date}<br><b>Mobile:</b> ${esc(x.mobile)}</div></div><h3>நகை விவரம்</h3><table><tr><th>வகை</th><th>Gross</th><th>Stone</th><th>Net</th><th>Purity</th></tr><tr><td>${esc(x.metal==='GOLD'?'தங்கம்':'வெள்ளி')} - ${esc(x.item)}</td><td>${x.gross}g</td><td>${x.stone}g</td><td>${x.net}g</td><td>${esc(x.purity)}</td></tr></table><p>Rate: <b>${money(x.rate)}/g</b></p><h3>அடகு தொகை</h3><p class="total">Loan Amount: ${money(x.loan)}</p><p>மாத வட்டி: <b>${x.interest}%</b><br>1 மாத வட்டி: <b>${money(x.loan*x.interest/100)}</b><br>Loan Period: <b>${x.months} மாதங்கள்</b><br>Due Date: <b>${x.due||'-'}</b></p><p>குறிப்பு: ${esc(x.notes||'—')}</p><div class="billfooter">வாடிக்கையாளர் கையொப்பம் ____________________<br><br>கடை கையொப்பம் ____________________<br><br>நன்றி! மீண்டும் வருக.</div>`}
+async function renderLoans(){
+  const q=(qloan.value||'').toLowerCase();
+  const a=db.loans.filter(x=>{const v=loanView(x);return (v.id+v.name+v.mobile).toLowerCase().includes(q)});
+  loanTable.innerHTML='<table><tr><th>Bill</th><th>வாடிக்கையாளர்</th><th>Metal</th><th>Loan</th><th>Due</th><th>Status</th><th></th></tr>'+a.map(x=>{const v=loanView(x);return `<tr><td>${esc(v.id)}</td><td>${esc(v.name)}<br>${esc(v.mobile)}</td><td>${v.metal==='GOLD'?'தங்கம்':'வெள்ளி'}</td><td>${money(v.loan)}</td><td>${v.due||'-'}</td><td><span class="badge ${v.status==='CLOSED'?'closed':''}">${v.status}</span></td><td><button class="secondary" onclick="openBill('${esc(v.uuid)}')">Bill</button></td></tr>`}).join('')+'</table>'}
+function openBill(uuid){let x=db.loans.find(a=>a.id===uuid);if(x){bill(loanView(x));page('billPage')}}
+function renderCustomers(){let q=(qcus.value||'').toLowerCase(),a=db.customers.filter(x=>(x.name+x.mobile).toLowerCase().includes(q));cusTable.innerHTML='<table><tr><th>பெயர்</th><th>மொபைல்</th><th>Loans</th><th>மொத்தம்</th></tr>'+a.map(c=>{const loans=db.loans.filter(l=>l.customer_id===c.id);return `<tr><td>${esc(c.name)}</td><td>${esc(c.mobile)}</td><td>${loans.length}</td><td>${money(loans.reduce((s,l)=>s+Number(l.loan_amount||0),0))}</td></tr>`}).join('')+'</table>'}
+async function payment(){
+  let billNo=paybill.value.trim(),amt=Number(payamt.value||0),t=paytype.value,loanRow=db.loans.find(a=>a.bill_no===billNo);if(!loanRow||!amt){paymsg.textContent='Bill No / amount சரிபார்க்கவும்';return}
+  try{
+    const {error}=await sb.from('payments').insert({loan_id:loanRow.id,amount:amt,payment_type:t,payment_date:paydate.value||today()});if(error)throw error;
+    if(t!=='Interest'){
+      const newPaid=Number(loanRow.principal_paid||0)+amt;
+      const patch={principal_paid:newPaid};if(t==='Full Settlement')patch.status='CLOSED';
+      const {data,error:e2}=await sb.from('loans').update(patch).eq('id',loanRow.id).select().single();if(e2)throw e2;Object.assign(loanRow,data);
+    } else if(t==='Full Settlement'){
+      const {data,error:e2}=await sb.from('loans').update({status:'CLOSED'}).eq('id',loanRow.id).select().single();if(e2)throw e2;Object.assign(loanRow,data);
+    }
+    await loadAll();paymsg.textContent=`${money(amt)} பதிவு செய்யப்பட்டது.`;paybill.value='';payamt.value='';renderLoans();toast('வசூல் பதிவு செய்யப்பட்டது');
+  }catch(e){paymsg.textContent='Save error: '+e.message}
+}
+function dash(){let a=db.loans.filter(x=>x.status==='ACTIVE');k1.textContent=db.loans.filter(x=>(x.created_at||'').slice(0,10)===today()).length;k2.textContent=money(db.loans.reduce((s,x)=>s+Number(x.loan_amount||0),0));k3.textContent=money(a.reduce((s,x)=>s+Number(x.loan_amount||0)-Number(x.principal_paid||0),0));k4.textContent=db.loans.filter(x=>x.status==='CLOSED').length}
+function reports(){rc.textContent=db.customers.length;ra.textContent=db.loans.filter(x=>x.status==='ACTIVE').length;rcl.textContent=db.loans.filter(x=>x.status==='CLOSED').length;ri.textContent=money(db.payments.filter(x=>x.payment_type==='Interest').reduce((s,x)=>s+Number(x.amount||0),0))}
+sb.auth.getSession().then(({data:{session}})=>{if(session)startApp()});
+</script></body></html>
