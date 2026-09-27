@@ -87,7 +87,7 @@ async function startApp(){
 }
 async function loadAll(){
   const [l,p,c]=await Promise.all([
-    sb.from('loans').select('*').order('created_at',{ascending:false}),
+    sb.from('loans').select('*,customers(name,mobile)').order('created_at',{ascending:false}),
     sb.from('payments').select('*').order('created_at',{ascending:false}),
     sb.from('customers').select('*').order('created_at',{ascending:false})
   ]);
