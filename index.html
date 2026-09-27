@@ -116,7 +116,7 @@ async function savePawn(){
       const {data,error}=await sb.from('customers').update({name:n,address:address.value,id_type:idtype.value,id_number:idno.value}).eq('id',customer.id).select().single();
       if(error)throw error;customer=data;db.customers=db.customers.map(c=>c.id===data.id?data:c);
     }else{
-      const {data,error}=await sb.from('customers').insert({name:n,mobile:m,address:address.value,id_type:idtype.value,id_number:idno.value}).select().single();
+      const {data,errori}=await sb.from('customers').insert({name:n,mobile:m,address:address.value,id_type:idtype.value,id_number:idno.value}).select().single();
       if(error)throw error;customer=data;db.customers.unshift(data);
     }
     const billNo=await nextBillNo();
@@ -136,7 +136,7 @@ async function renderLoans(){
   const q=(qloan.value||'').toLowerCase();
   const a=db.loans.filter(x=>{const v=loanView(x);return (v.id+v.name+v.mobile).toLowerCase().includes(q)});
   loanTable.innerHTML='<table><tr><th>Bill</th><th>வாடிக்கையாளர்</th><th>Metal</th><th>Loan</th><th>Due</th><th>Status</th><th></th></tr>'+a.map(x=>{const v=loanView(x);return `<tr><td>${esc(v.id)}</td><td>${esc(v.name)}<br>${esc(v.mobile)}</td><td>${v.metal==='GOLD'?'தங்கம்':'வெள்ளி'}</td><td>${money(v.loan)}</td><td>${v.due||'-'}</td><td><span class="badge ${v.status==='CLOSED'?'closed':''}">${v.status}</span></td><td><button class="secondary" onclick="openBill('${esc(v.uuid)}')">Bill</button></td></tr>`}).join('')+'</table>'}
-function openBill(uuid){let x=db.loans.find(a=>a.id===uuid);if(x){bill(loanView(x));page('billPage')}}
+function openBill(uuid){let x=db.loans.find(a=>a.id===uuid||a.bill_no===uuid);if(x){bill(loanView(x));page('billPage')}}
 function renderCustomers(){let q=(qcus.value||'').toLowerCase(),a=db.customers.filter(x=>(x.name+x.mobile).toLowerCase().includes(q));cusTable.innerHTML='<table><tr><th>பெயர்</th><th>மொபைல்</th><th>Loans</th><th>மொத்தம்</th></tr>'+a.map(c=>{const loans=db.loans.filter(l=>l.customer_id===c.id);return `<tr><td>${esc(c.name)}</td><td>${esc(c.mobile)}</td><td>${loans.length}</td><td>${money(loans.reduce((s,l)=>s+Number(l.loan_amount||0),0))}</td></tr>`}).join('')+'</table>'}
 async function payment(){
   let billNo=paybill.value.trim(),amt=Number(payamt.value||0),t=paytype.value,loanRow=db.loans.find(a=>a.bill_no===billNo);if(!loanRow||!amt){paymsg.textContent='Bill No / amount சரிபார்க்கவும்';return}
