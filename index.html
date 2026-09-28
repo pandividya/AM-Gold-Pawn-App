@@ -125,7 +125,7 @@ async function savePawn(){
     if(error)throw error;
     const x={...data,id:data.bill_no,date:data.created_at?data.created_at.slice(0,10):today(),name:n,mobile:m,address:address.value,idtype:idtype.value,idno:idno.value,item:data.item,gross:Number(data.gross_weight||0),stone:Number(data.stone_weight||0),net:Number(data.net_weight||0),purity:data.purity,rate:Number(data.gold_rate||0),loan:Number(data.loan_amount||0),interest:Number(data.interest_percent||0),months:Number(data.loan_months||0),due:data.due_date||'',notes:data.notes||'',status:data.status,principalPaid:Number(data.principal_paid||0),uuid:data.id};
     db.loans.unshift(data);bill(x);page('billPage');clearForm();dash();toast('அடகு பதிவு வெற்றிகரமாக சேமிக்கப்பட்டது');
-  }catch(e){alert('save error : '+e.message)}
+}catch(e){alert('SAVE ERROR\nMessage: '+e.message+'\nCode: '+(e.code||'')+'\nDetails: '+(e.details||''))}
 }
 function clearForm(){['name','mobile','address','idno','item','gross','stone','net','rate','loan','due','notes'].forEach(id=>document.getElementById(id).value='');stone.value=0;months.value=6;setRate()}
 function loanView(x){
