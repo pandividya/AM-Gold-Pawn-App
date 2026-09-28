@@ -121,8 +121,8 @@ async function savePawn(){
     }
     const billNo=await nextBillNo();
     loan_amount:Number(loan.value||0),interest_percent
-    const {data,error}=await sb.from('loans').insert(payload).select().single();
-    if(error)throw error;
+    const {data,err}=await sb.from('loans').insert(payload).select().single();
+    if(err)throw err;
     const x={...data,id:data.bill_no,date:data.created_at?data.created_at.slice(0,10):today(),name:n,mobile:m,address:address.value,idtype:idtype.value,idno:idno.value,item:data.item,gross:Number(data.gross_weight||0),stone:Number(data.stone_weight||0),net:Number(data.net_weight||0),purity:data.purity,rate:Number(data.gold_rate||0),loan:Number(data.loan_amount||0),interest:Number(data.interest_percent||0),months:Number(data.loan_months||0),due:data.due_date||'',notes:data.notes||'',status:data.status,principalPaid:Number(data.principal_paid||0),uuid:data.id};
     db.loans.unshift(data);bill(x);page('billPage');clearForm();dash();toast('அடகு பதிவு வெற்றிகரமாக சேமிக்கப்பட்டது');
 }catch(e){alert('SAVE ERROR\nMessage: '+e.message+'\nCode: '+(e.code||'')+'\nDetails: '+(e.details||''))}
