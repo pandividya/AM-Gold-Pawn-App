@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="ta">
-<head>
+</head></head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#064d3b"><link rel="manifest" href="manifest.json">
 <title>A M தங்க நகை அடகு கடை - Online</title>
@@ -115,13 +115,9 @@ async function savePawn(){
     if(customer){
       const {data,error}=await sb.from('customers').update({name:n,address:address.value,id_type:idtype.value,id_number:idno.value}).eq('id',customer.id).select().single();
       if(error)throw error;customer=data;db.customers=db.customers.map(c=>c.id===data.id?data:c);
-    }else{
-      const {data,errori}=await sb.from('customers').insert({name:n,mobile:m,address:address.value,id_type:idtype.value,id_number:idno.value}).select().single();
-      if(error)throw error;customer=data;db.customers.unshift(data);
     }
-    const billNo=await nextBillNo();
-    loan_amount:Number(loan.value||0),interest_percent
-    const {data,err}=await sb.from('loans').insert(payload).select().single();
+  oan_amount:Number(loan.value||0),interest_percent
+    const {data,err}=await sb.from('iloans').insert(payload).select().single();
     if(err)throw err;
     const x={...data,id:data.bill_no,date:data.created_at?data.created_at.slice(0,10):today(),name:n,mobile:m,address:address.value,idtype:idtype.value,idno:idno.value,item:data.item,gross:Number(data.gross_weight||0),stone:Number(data.stone_weight||0),net:Number(data.net_weight||0),purity:data.purity,rate:Number(data.gold_rate||0),loan:Number(data.loan_amount||0),interest:Number(data.interest_percent||0),months:Number(data.loan_months||0),due:data.due_date||'',notes:data.notes||'',status:data.status,principalPaid:Number(data.principal_paid||0),uuid:data.id};
     db.loans.unshift(data);bill(x);page('billPage');clearForm();dash();toast('அடகு பதிவு வெற்றிகரமாக சேமிக்கப்பட்டது');
