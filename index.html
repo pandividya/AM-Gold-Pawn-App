@@ -116,7 +116,7 @@ async function savePawn(){
       const {data,error}=await sb.from('customers').update({name:n,address:address.value,id_type:idtype.value,id_number:idno.value}).eq('id',customer.id).select().single();
       if(error)throw error;customer=data;db.customers=db.customers.map(c=>c.id===data.id?data:c);
     }
-  oan_amount:Number(loan.value||0),interest_percent
+const payload={bill_no:billNo,customer_id:customer.id,metal:metal.value,item:item.value||'Jewellery',gross_weight:Number(gross.value||0),stone_weight:Number(stone.value||0),net_weight:Number(net.value||0),purity:purity.value,gold_rate:Number(rate.value||0),loan_amount:Number(loan.value||0),interest_percent:Number(document.getElementByid('interest').value||0),loan_months:Number(months.value||0),due_date:due.value||null,notes:notes.value||null,status:'ACTIVE',principal_paid:0};
     const {data,err}=await sb.from('iloans').insert(payload).select().single();
     if(err)throw err;
     const x={...data,id:data.bill_no,date:data.created_at?data.created_at.slice(0,10):today(),name:n,mobile:m,address:address.value,idtype:idtype.value,idno:idno.value,item:data.item,gross:Number(data.gross_weight||0),stone:Number(data.stone_weight||0),net:Number(data.net_weight||0),purity:data.purity,rate:Number(data.gold_rate||0),loan:Number(data.loan_amount||0),interest:Number(data.interest_percent||0),months:Number(data.loan_months||0),due:data.due_date||'',notes:data.notes||'',status:data.status,principalPaid:Number(data.principal_paid||0),uuid:data.id};
